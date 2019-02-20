@@ -177,35 +177,42 @@ def set_1_challenge_6():
         first_keysize_input = input[0:keysize]
         second_keysize_input = input[keysize:keysize*2]
 
+        #Caluclate the hamming distance between the bytes in the string
         distance = hamming_distance(first_keysize_input, second_keysize_input)
 
+        #Normalize this distance by dividing it by it's keysize
         normalized_distance = distance / keysize
         keysizes[keysize] = normalized_distance
 
-
+    # Sort on lowest hamming distance
     keysizes = sorted(keysizes.items(), key=operator.itemgetter(1))
 
     outputs = []
     scores = []
     highest_score = 0
 
+    #Loop through all keysizes
     for possible_key in keysizes:
         key = ""
+        #Create transposed blocks and brute force thoseself.
+        #Based on English probability add the "most probable" char to the key
         for length in range(possible_key[0] + 1):
             transposed_block = ""
             for i in range(length, len(input), possible_key[0] + 1):
                 transposed_block += input[i]
 
             key += brute_force_single_key_xor(transposed_block)
+        #Try to crack the input with all keys
         result = multi_key_xor(input, key)
 
         outputs.append(result)
         scores.append(english_probability(result))
 
+    #Caluclate the best result based on English probability
     for score in scores:
         if(score > highest_score):
             highest_score = score
-
+    #Finally print the result
     print(outputs[scores.index(highest_score)])
 
 def set_1_challenge_7():
